@@ -17,13 +17,13 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Ludopatia bienvenido!</ThemedText>
         <HelloWave />
-      </ThemedView>
+      </ThemedView> 
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
+        <ThemedText type="subtitle">Step 1: APUESTAAAAAAA</ThemedText>
         <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
+          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> ya cambia vamooo.
           Press{' '}
           <ThemedText type="defaultSemiBold">
             {Platform.select({
