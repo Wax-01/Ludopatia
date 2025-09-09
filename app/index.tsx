@@ -1,33 +1,5 @@
-import { Button, Image, StyleSheet, Text, View } from "react-native";
+import { Redirect } from "expo-router";
 
-export default function Index() {
-  return (
-    <View
-      style={styles.container}
-    >
-      <Button title="Press me" />
-      <Image source={require('../assets/images/react-logo.png')} style={styles.Logo} />
-      <Text style={styles.text}>Hola buenas</Text>
-    </View>
-
-    
-  );
+export default function index(){
+  return <Redirect href="/(Auth)/login" />;
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: "center",
-     alignItems: "center",
-  },
-  text:{
-    fontSize: 30,
-    color: 'blue'
-  },
-  Logo:{
-    width: 100,
-    height: 100
-  }
-})
