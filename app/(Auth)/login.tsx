@@ -14,7 +14,9 @@ export default function Index() {
     if (success) {
       router.push("/Main/(tabs)/Main");
     }
-    // Si es false, no hace nada (puedes mostrar un mensaje si quieres)
+    else{
+      alert("Error al iniciar sesión. Revisa tus credenciales.");
+    }
   };
 
   return (

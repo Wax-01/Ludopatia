@@ -1,27 +1,53 @@
-import { Link, useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { AuthContext } from "@/contexts/AuthContext";
+import { useRouter } from "expo-router";
+import { useContext, useState } from "react";
+import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const context = useContext(AuthContext);
+  const router = useRouter();
 
-    const router = useRouter();
-    return (
+  const handleRegister = async () => {
+    if (!email || !password || !repeatPassword) {
+      Alert.alert("Error", "Completa todos los campos.");
+      return;
+    }
+    if (password !== repeatPassword) {
+      Alert.alert("Error", "Las contraseñas no coinciden.");
+      return;
+    }
+    setLoading(true);
+    const result = await context.register(email, password);
+    setLoading(false);
+    if (result.success) {
+      Alert.alert("¡Registro exitoso!", "Ahora puedes iniciar sesión.", [
+        { text: "OK", onPress: () => router.push("/(Auth)/login") }
+      ]);
+    } else {
+      Alert.alert("Error", result.error || "No se pudo registrar.");
+    }
+  };
+
+  return (
     <View style={styles.container}>
       <Text style={styles.title}>NAIVEES</Text>
       <Image source={require('../../assets/images/IconBet.png')} style={styles.Logo} />
-      <Text style={styles.text}>Intruduce tu nombre de usuario </Text>
-      <TextInput style={styles.input}></TextInput>
+      <Text style={styles.text}>Introduce tu correo electrónico</Text>
+      <TextInput style={styles.input} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
       <Text style={styles.text}>Contraseña</Text>
-      <TextInput style={styles.input}></TextInput>
-        <Text style={styles.text}>Escribe tu contraseña otra vez</Text>
-      <TextInput style={styles.input}></TextInput>
-      <TouchableOpacity style={styles.buttonlogin}>
-        <Text style={styles.text}>Registrate</Text>
+      <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
+      <Text style={styles.text}>Repite tu contraseña</Text>
+      <TextInput style={styles.input} value={repeatPassword} onChangeText={setRepeatPassword} secureTextEntry />
+      <TouchableOpacity style={styles.buttonlogin} onPress={handleRegister} disabled={loading}>
+        <Text style={styles.text}>{loading ? "Registrando..." : "Registrate"}</Text>
       </TouchableOpacity>
-      <Text style={styles.descrition}>¿Ya tienes cuenta? </Text>
-      <TouchableOpacity style={styles.buttonlogin}>
-        <Link href="/(Auth)/login" asChild>
-          <Text style={styles.text}>Inicia sesion aqui</Text>
-        </Link>
+      <Text style={styles.descrition}>¿Ya tienes cuenta?</Text>
+      <TouchableOpacity style={styles.buttonlogin} onPress={() => router.push("/(Auth)/login")}>
+        <Text style={styles.text}>Inicia sesión aquí</Text>
       </TouchableOpacity>
     </View>
   );
