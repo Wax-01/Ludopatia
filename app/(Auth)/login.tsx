@@ -1,8 +1,21 @@
-
+import { AuthContext } from "@/contexts/AuthContext";
+import { useRouter } from "expo-router";
+import { useContext, useState } from "react";
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const context = useContext(AuthContext);
+  const router = useRouter();
 
+  const handleLogin = async () => {
+    const success = await context.login(email, password);
+    if (success) {
+      router.push("/Main/(tabs)/Main");
+    }
+    // Si es false, no hace nada (puedes mostrar un mensaje si quieres)
+  };
 
   return (
     <View style={styles.container}>
@@ -10,15 +23,23 @@ export default function Index() {
       <Image source={require('../../assets/images/IconBet.png')} style={styles.Logo} />
       <Text style={styles.descrition}>La app para perd... Ganar dinero legalmente.</Text>
       <Text style={styles.text}>Usuario</Text>
-      <TextInput style={styles.input}></TextInput>
+      <TextInput style={styles.input} value={email} onChangeText={setEmail} />
       <Text style={styles.text}>Contraseña</Text>
-      <TextInput style={styles.input}></TextInput>
-      <TouchableOpacity style={styles.buttonlogin}>
-        <Text style={styles.text}>Iniciar sesion</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Contraseña"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry={true}
+      />
+
+      <TouchableOpacity style={styles.buttonlogin} onPress={handleLogin}>
+        <Text style={styles.text}>iniciar sesion</Text>
       </TouchableOpacity>
+
       <Text style={styles.descrition}>¿No tienes cuenta? Registrate</Text>
       <TouchableOpacity style={styles.buttonlogin}>
-        <Text style={styles.text}>Registrate aqui</Text>
+        <Text style={styles.text} onPress={() => router.push("/(Auth)/register")}>Registrate</Text>
       </TouchableOpacity>
     </View>
   );

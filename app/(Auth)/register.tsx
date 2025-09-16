@@ -1,10 +1,10 @@
-
+import { Link, useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
 
-
-  return (
+    const router = useRouter();
+    return (
     <View style={styles.container}>
       <Text style={styles.title}>NAIVEES</Text>
       <Image source={require('../../assets/images/IconBet.png')} style={styles.Logo} />
@@ -19,7 +19,9 @@ export default function Index() {
       </TouchableOpacity>
       <Text style={styles.descrition}>¿Ya tienes cuenta? </Text>
       <TouchableOpacity style={styles.buttonlogin}>
-        <Text style={styles.text}>Iniciar sesion</Text>
+        <Link href="/(Auth)/login" asChild>
+          <Text style={styles.text}>Inicia sesion aqui</Text>
+        </Link>
       </TouchableOpacity>
     </View>
   );
