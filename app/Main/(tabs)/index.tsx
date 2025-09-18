@@ -1,5 +1,15 @@
+import { AuthContext } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { useContext } from "react";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const tarjetas = [
   { id: "1", nombre: "Visa **** 1234", tipo: "visa" },
@@ -36,17 +46,24 @@ function getIcon(tipo: string) {
 }
 
 export default function Perfil() {
+  const { user } = useContext(AuthContext);
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
       <Image
         source={require("../../../assets/images/profile.jpg")}
         style={styles.fotoPerfil}
       />
-      <Text style={styles.nombre}>Julian Aguilar</Text>
-      <Text style={styles.label}>Fecha de nacimiento</Text>
-      <Text style={styles.info}>12/05/2002</Text>
-      <Text style={styles.label}>Saldo actual:</Text>
-      <Text style={styles.info}>120$</Text>
+      <Text style={styles.nombre}>{user?.name || "Nombre no disponible"}</Text>
+      <Text style={styles.label}>Username</Text>
+      <Text style={styles.info}>{user?.username || "Sin username"}</Text>
+      <Text style={styles.label}>Biografía</Text>
+      <Text style={styles.info}>{user?.bio || "Sin biografía"}</Text>
+      <Text style={styles.label}>Teléfono</Text>
+      <Text style={styles.info}>{user?.phone || "Sin teléfono"}</Text>
+      <Text style={styles.label}>Género</Text>
+      <Text style={styles.info}>{user?.gender || "Sin género"}</Text>
       <Text style={styles.label}>Tarjetas usadas</Text>
       <FlatList
         data={tarjetas}
@@ -59,6 +76,12 @@ export default function Perfil() {
         )}
         style={styles.listaTarjetas}
       />
+      <TouchableOpacity
+        style={styles.buttonEdit}
+        onPress={() => router.push("/Main/UpdateForm")}
+      >
+        <Text style={styles.buttonEditText}>Editar perfil</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -113,5 +136,18 @@ const styles = StyleSheet.create({
   tarjetaTexto: {
     color: "white",
     fontSize: 16,
+  },
+  buttonEdit: {
+    backgroundColor: "darkred",
+    padding: 12,
+    borderRadius: 10,
+    width: "60%",
+    alignItems: "center",
+    marginTop: 30,
+  },
+  buttonEditText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });

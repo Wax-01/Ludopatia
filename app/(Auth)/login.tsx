@@ -10,11 +10,12 @@ export default function Index() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    const success = await context.login(email, password);
+    const cleanEmail = email.trim();
+      const cleanPassword = password.trim();
+    const success = await context.login(cleanEmail, cleanPassword);
     if (success) {
       router.push("/Main/(tabs)/Main");
-    }
-    else{
+    } else {
       alert("Error al iniciar sesión. Revisa tus credenciales.");
     }
   };

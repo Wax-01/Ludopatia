@@ -12,7 +12,10 @@ export default function Index() {
   const router = useRouter();
 
   const handleRegister = async () => {
-    if (!email || !password || !repeatPassword) {
+    const cleanEmail = email.trim();
+    const cleanUsername = cleanEmail.split('@')[0].trim();
+
+    if (!cleanEmail || !password || !repeatPassword) {
       Alert.alert("Error", "Completa todos los campos.");
       return;
     }
@@ -21,7 +24,7 @@ export default function Index() {
       return;
     }
     setLoading(true);
-    const result = await context.register(email, password);
+    const result = await context.register(cleanEmail, password, cleanUsername);
     setLoading(false);
     if (result.success) {
       Alert.alert("¡Registro exitoso!", "Ahora puedes iniciar sesión.", [
@@ -31,6 +34,8 @@ export default function Index() {
       Alert.alert("Error", result.error || "No se pudo registrar.");
     }
   };
+
+
 
   return (
     <View style={styles.container}>
