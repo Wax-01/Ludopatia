@@ -1,7 +1,8 @@
+import ModalCamera from "@/components/ModalCamera";
 import { AuthContext } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import {
   FlatList,
   Image,
@@ -48,13 +49,18 @@ function getIcon(tipo: string) {
 export default function Perfil() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../../../assets/images/profile.jpg")}
-        style={styles.fotoPerfil}
-      />
+      <ModalCamera modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <Image
+          source={require("../../../assets/images/profile.jpg")}
+          style={styles.fotoPerfil}
+        />
+      </TouchableOpacity>
+
       <Text style={styles.nombre}>{user?.name || "Nombre no disponible"}</Text>
       <Text style={styles.label}>Username</Text>
       <Text style={styles.info}>{user?.username || "Sin username"}</Text>
