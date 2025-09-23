@@ -50,10 +50,10 @@ export default function Perfil() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
-  const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
+  const [profileImageBase64, setProfileImageBase64] = useState<string | null>(null);
 
-  const handlePictureTaken = (uri: string) => {
-    setProfileImageUri(uri);
+  const handlePictureTaken = (base64: string) => {
+    setProfileImageBase64(base64);
     setModalVisible(false);
   };
 
@@ -67,10 +67,10 @@ export default function Perfil() {
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Image
           source={
-    profileImageUri
-      ? { uri: profileImageUri }
-      : require("../../../assets/images/profile.jpg")
-  }
+            profileImageBase64
+              ? { uri: `data:image/jpeg;base64,${profileImageBase64}` }
+              : require("../../../assets/images/profile.jpg")
+          }
           style={styles.fotoPerfil}
         />
       </TouchableOpacity>
