@@ -2,7 +2,7 @@ import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { useRef, useState } from 'react';
 import { Button, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ModalCamera({ modalVisible, setModalVisible }: { modalVisible: boolean, setModalVisible: (v: boolean) => void }) {
+export default function ModalCamera({ modalVisible, setModalVisible, onPictureTaken }: { modalVisible: boolean, setModalVisible: (v: boolean) => void, onPictureTaken: (uri: string) => void }) {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<any>(null);
@@ -24,12 +24,13 @@ export default function ModalCamera({ modalVisible, setModalVisible }: { modalVi
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   }
 
-const takePicture = async () => {
-  if (cameraRef.current) {
-    const photo = await cameraRef.current.takePictureAsync();
-    setModalVisible(false);
-  }
-};
+  const takePicture = async () => {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync();
+      onPictureTaken(photo.uri);
+      setModalVisible(false);
+    }
+  };
 
   return (
     <Modal
@@ -38,7 +39,6 @@ const takePicture = async () => {
       transparent={true}
       visible={modalVisible}
       onRequestClose={() => setModalVisible(false)}
-      
     >
       <CameraView
         ref={cameraRef}

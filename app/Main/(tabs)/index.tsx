@@ -50,13 +50,27 @@ export default function Perfil() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
+  const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
+
+  const handlePictureTaken = (uri: string) => {
+    setProfileImageUri(uri);
+    setModalVisible(false);
+  };
 
   return (
     <View style={styles.container}>
-      <ModalCamera modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <ModalCamera
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        onPictureTaken={handlePictureTaken}
+      />
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Image
-          source={require("../../../assets/images/profile.jpg")}
+          source={
+    profileImageUri
+      ? { uri: profileImageUri }
+      : require("../../../assets/images/profile.jpg")
+  }
           style={styles.fotoPerfil}
         />
       </TouchableOpacity>
