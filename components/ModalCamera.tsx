@@ -1,6 +1,9 @@
+import { AuthContext } from "@/contexts/AuthContext";
+import { supabase } from "@/utils/supabase";
+import { decode } from 'base64-arraybuffer';
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { Button, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ModalCameraProps {
@@ -10,10 +13,12 @@ interface ModalCameraProps {
 }
 
 export default function ModalCamera({ modalVisible, setModalVisible, onPictureTaken }: ModalCameraProps) {
+  const { user } = useContext(AuthContext); // <--- Así accedes al usuario
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<any>(null);
   const [preview, setPreview] = useState<{ uri: string; base64: string } | null>(null);
+
 
   if (!permission) return <View />;
   if (!permission.granted) {
@@ -71,6 +76,27 @@ export default function ModalCamera({ modalVisible, setModalVisible, onPictureTa
     setPreview(null);
   };
 
+const handleSaveImageBucket = async () => {
+        try {
+            const folder = user.id;
+            const filename = Date.now()
+
+            const { data, error } = await supabase
+                .storage
+                .from('PerfilPhotos')
+                .upload(`${folder}${filename}.jpg`,
+                    decode(preview!.base64), {
+                    contentType: 'image/jpg'
+                })
+
+            if (!error) {
+                onPictureTaken(data!.fullPath);
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
   return (
     <Modal
       style={styles.container}

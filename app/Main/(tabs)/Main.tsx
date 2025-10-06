@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";
+import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const tiposApuestas = [
   { id: "1", nombre: "Carreras de caballos", icon: "horse", imagen: require("../../../assets/images/caballos.jpeg") },
@@ -30,63 +31,83 @@ function getTipoIcon(tipo: string) {
 }
 
 export default function Main() {
+  const router = useRouter();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>NAIVEES</Text>
-      {/* Partido destacado */}
-      <View style={styles.partido}>
-        <Text style={styles.tituloPartido}>Apuesta en el partido</Text>
-        <View style={styles.equipos}>
-          <Image
-            source={require("../../../assets/images/Madrid.jpeg")}
-            style={styles.logoEquipo}
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>NAIVEES</Text>
+        {/* Partido destacado */}
+        <View style={styles.partido}>
+          <Text style={styles.tituloPartido}>Apuesta en el partido</Text>
+          <View style={styles.equipos}>
+            <Image
+              source={require("../../../assets/images/Madrid.jpeg")}
+              style={styles.logoEquipo}
+            />
+            <Text style={styles.vs}>VS</Text>
+            <Image
+              source={require("../../../assets/images/Barcelona.png")}
+              style={styles.logoEquipo}
+            />
+          </View>
+          {/* Resultado parcial */}
+          <Text style={styles.resultadoPartido}>2 - 1 | 23 minutos</Text>
+          <Text style={styles.infoPartido}>Real Madrid vs Barcelona</Text>
+          <TouchableOpacity style={styles.botonApostar}>
+            <Text style={styles.textoBoton}>Apostar</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Oferta */}
+        <View style={styles.oferta}>
+          <Ionicons
+            name="gift"
+            size={32}
+            color="#fff"
+            style={{ marginRight: 10 }}
           />
-          <Text style={styles.vs}>VS</Text>
-          <Image
-            source={require("../../../assets/images/Barcelona.png")}
-            style={styles.logoEquipo}
+          <Text style={styles.textoOferta}>¡Oferta! Click aqui para ganar 10$</Text>
+        </View>
+
+        {/* Botón para ir a chats */}
+        <TouchableOpacity
+          style={styles.botonChat}
+          onPress={() => router.push("/Main/chat")}
+        >
+          <Ionicons name="chatbubbles" size={22} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={styles.textoBoton}>Ir a chats</Text>
+        </TouchableOpacity>
+
+        {/* Tipos de apuestas */}
+        <Text style={styles.tituloApuestas}>Tipos de apuestas</Text>
+        <View style={styles.apuestasScroll}>
+          <FlatList
+            data={tiposApuestas}
+            keyExtractor={(item) => item.id}
+            numColumns={3}
+            renderItem={({ item }) => (
+              <View style={styles.cuadroApuesta}>
+                <Image source={item.imagen} style={styles.imagenApuesta} />
+                <Text style={styles.textoApuesta}>{item.nombre}</Text>
+              </View>
+            )}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
           />
         </View>
-        {/* Resultado parcial */}
-        <Text style={styles.resultadoPartido}>2 - 1 | 23 minutos</Text>
-        <Text style={styles.infoPartido}>Real Madrid vs Barcelona</Text>
-        <TouchableOpacity style={styles.botonApostar}>
-          <Text style={styles.textoBoton}>Apostar</Text>
-        </TouchableOpacity>
       </View>
-
-      {/* Oferta */}
-      <View style={styles.oferta}>
-        <Ionicons
-          name="gift"
-          size={32}
-          color="#fff"
-          style={{ marginRight: 10 }}
-        />
-        <Text style={styles.textoOferta}>¡Oferta! Click aqui para ganar 10$</Text>
-      </View>
-
-      {/* Tipos de apuestas */}
-      <Text style={styles.tituloApuestas}>Tipos de apuestas</Text>
-      <View style={styles.apuestasScroll}>
-        <FlatList
-          data={tiposApuestas}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          renderItem={({ item }) => (
-            <View style={styles.cuadroApuesta}>
-              <Image source={item.imagen} style={styles.imagenApuesta} />
-              <Text style={styles.textoApuesta}>{item.nombre}</Text>
-            </View>
-          )}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    backgroundColor: "#000",
+    alignItems: "center",
+    paddingBottom: 30,
+  },
   title: {
     color: 'white',
     fontSize: 32,
@@ -95,8 +116,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   container: {
-    flex: 1,
-    backgroundColor: "#000",
+    width: "100%",
     alignItems: "center",
     paddingTop: 30,
   },
@@ -171,6 +191,16 @@ const styles = StyleSheet.create({
     color: "gold",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  botonChat: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "darkred",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    marginBottom: 20,
+    marginTop: 5,
   },
   tituloApuestas: {
     color: "white",

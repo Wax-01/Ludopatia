@@ -1,5 +1,6 @@
 import ModalCamera from "@/components/ModalCamera";
 import { AuthContext } from "@/contexts/AuthContext";
+import { uploadProfilePhoto } from "@/utils/helper"; // o donde guardes la función
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
@@ -47,14 +48,27 @@ function getIcon(tipo: string) {
 }
 
 export default function Perfil() {
-  const { user } = useContext(AuthContext);
+  const { user, updateProfile } = useContext(AuthContext);
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const [profileImageBase64, setProfileImageBase64] = useState<string | null>(null);
 
-  const handlePictureTaken = (base64: string) => {
-    setProfileImageBase64(base64);
-    setModalVisible(false);
+  const handlePictureTaken = async (base64: string) => {
+    try {
+      if (!user?.id) return;
+      const url = await uploadProfilePhoto(base64, user.id);
+      await updateProfile({ avatar_url: url });
+      setProfileImageBase64(base64);
+      setModalVisible(false);
+    } catch (e) {
+      console.error("Error al subir la imagen:", e);
+      alert(
+        "Error al subir la imagen: " +
+          (e && typeof e === "object" && "message" in e
+            ? (e as Error).message
+            : String(e))
+      );
+    }
   };
 
   return (
