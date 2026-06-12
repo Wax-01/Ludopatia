@@ -1,3 +1,4 @@
+import Modal from "@/components/Modalvideo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -59,16 +60,7 @@ export default function Main() {
           </TouchableOpacity>
         </View>
 
-        {/* Oferta */}
-        <View style={styles.oferta}>
-          <Ionicons
-            name="gift"
-            size={32}
-            color="#fff"
-            style={{ marginRight: 10 }}
-          />
-          <Text style={styles.textoOferta}>¡Oferta! Click aqui para ganar 10$</Text>
-        </View>
+       
 
         {/* Botón para ir a chats */}
         <TouchableOpacity
@@ -79,6 +71,10 @@ export default function Main() {
           <Text style={styles.textoBoton}>Ir a chats</Text>
         </TouchableOpacity>
 
+
+        <Modal>
+          
+        </Modal>
         {/* Tipos de apuestas */}
         <Text style={styles.tituloApuestas}>Tipos de apuestas</Text>
         <View style={styles.apuestasScroll}>

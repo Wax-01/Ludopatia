@@ -33,3 +33,30 @@ export async function uploadProfilePhoto(base64: string, userId: string) {
 
   return publicUrlData.publicUrl;
 }
+// En helper.tsx
+export async function uploadBetPhoto(base64: string, userId: string) {
+  const filePath = `${userId}/bet_${Date.now()}.jpg`;
+  const fileData = base64ToUint8Array(base64); // Usa decode de base64-arraybuffer
+
+  const { data, error } = await supabase
+    .storage
+    .from('Betphotos') // ← Asegúrate que este sea el nombre correcto
+    .upload(filePath, fileData, {
+      contentType: 'image/jpeg',
+    });
+
+  if (error) {
+    console.error('Error uploading to Supabase:', error);
+    throw error;
+  }
+
+  // IMPORTANTE: Usa getPublicUrl, NO getSignedUrl
+  const { data: publicUrlData } = supabase
+    .storage
+    .from('Betphotos')
+    .getPublicUrl(filePath);
+
+  console.log('Public URL generated:', publicUrlData.publicUrl);
+  
+  return publicUrlData.publicUrl;
+}

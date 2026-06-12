@@ -1,16 +1,22 @@
-import { AuthContext } from "@/contexts/AuthContext";
 import { supabase } from "@/utils/supabase";
 import { Ionicons } from "@expo/vector-icons";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  FlatList,
-  Image,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    FlatList,
+    Image,
+    Modal,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
+
+interface HistorialModalProps {
+  visible: boolean;
+  onClose: () => void;
+  userId: string;
+}
 
 interface BetHistory {
   id: string;
@@ -25,8 +31,7 @@ interface BetHistory {
   multiplier: number;
 }
 
-export default function HistorialApuestas() {
-  const { user } = useContext(AuthContext);
+export default function HistorialModal({ visible, onClose, userId }: HistorialModalProps) {
   const [history, setHistory] = useState<BetHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'won' | 'lost'>('all');
@@ -38,8 +43,10 @@ export default function HistorialApuestas() {
   });
 
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    if (visible) {
+      fetchHistory();
+    }
+  }, [visible]);
 
   useEffect(() => {
     calculateStats();
@@ -51,7 +58,7 @@ export default function HistorialApuestas() {
       const { data, error } = await supabase
         .from('user_bet_history')
         .select('*')
-        .eq('user_id', user?.id);
+        .eq('user_id', userId);
 
       if (error) throw error;
       setHistory(data || []);
@@ -111,7 +118,6 @@ export default function HistorialApuestas() {
     
     return (
       <View style={styles.historyCard}>
-        {/* Imagen y detalles */}
         <View style={styles.cardHeader}>
           {item.bet_image ? (
             <Image source={{ uri: item.bet_image }} style={styles.betImage} />
@@ -128,13 +134,11 @@ export default function HistorialApuestas() {
             <Text style={styles.betDate}>{formatDate(item.joined_at)}</Text>
           </View>
 
-          {/* Badge de estado */}
           <View style={[styles.statusBadge, { backgroundColor: statusInfo.color }]}>
             <Ionicons name={statusInfo.icon as any} size={16} color="#fff" />
           </View>
         </View>
 
-        {/* Detalles financieros */}
         <View style={styles.cardDetails}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Inversión:</Text>
@@ -187,98 +191,111 @@ export default function HistorialApuestas() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Estadísticas generales */}
-      <View style={styles.statsContainer}>
-        <Text style={styles.title}>Mi Historial</Text>
-        
-        <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
-            <Ionicons name="trophy" size={24} color="#4CAF50" />
-            <Text style={styles.statValue}>+{stats.totalWon}</Text>
-            <Text style={styles.statLabel}>Ganado</Text>
-          </View>
-          
-          <View style={styles.statCard}>
-            <Ionicons name="trending-down" size={24} color="#f44336" />
-            <Text style={styles.statValue}>-{stats.totalLost}</Text>
-            <Text style={styles.statLabel}>Perdido</Text>
-          </View>
-          
-          <View style={styles.statCard}>
-            <Ionicons name="time" size={24} color="#FFA726" />
-            <Text style={styles.statValue}>{stats.totalPending}</Text>
-            <Text style={styles.statLabel}>Pendiente</Text>
-          </View>
-          
-          <View style={styles.statCard}>
-            <Ionicons name="wallet" size={24} color="#56f321ff" />
-            <Text style={styles.statValue}>{user?.points}</Text>
-            <Text style={styles.statLabel}>Saldo Actual</Text>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={onClose}
+    >
+      <View style={styles.container}>
+        {/* Header con botón de cerrar */}
+        <View style={styles.modalHeader}>
+          <Text style={styles.title}>Mi Historial</Text>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Ionicons name="close" size={28} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Estadísticas generales */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statsGrid}>
+            <View style={styles.statCard}>
+              <Ionicons name="trophy" size={24} color="#4CAF50" />
+              <Text style={styles.statValue}>+{stats.totalWon}</Text>
+              <Text style={styles.statLabel}>Ganado</Text>
+            </View>
+            
+            <View style={styles.statCard}>
+              <Ionicons name="trending-down" size={24} color="#f44336" />
+              <Text style={styles.statValue}>-{stats.totalLost}</Text>
+              <Text style={styles.statLabel}>Perdido</Text>
+            </View>
+            
+            <View style={styles.statCard}>
+              <Ionicons name="time" size={24} color="#FFA726" />
+              <Text style={styles.statValue}>{stats.totalPending}</Text>
+              <Text style={styles.statLabel}>Pendiente</Text>
+            </View>
+            
+            <View style={styles.statCard}>
+              <Ionicons name="stats-chart" size={24} color="#2196F3" />
+              <Text style={styles.statValue}>{stats.winRate.toFixed(0)}%</Text>
+              <Text style={styles.statLabel}>Efectividad</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Filtros */}
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[styles.filterButton, filter === 'all' && styles.filterActive]}
-          onPress={() => setFilter('all')}
-        >
-          <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>
-            Todas
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.filterButton, filter === 'pending' && styles.filterActive]}
-          onPress={() => setFilter('pending')}
-        >
-          <Text style={[styles.filterText, filter === 'pending' && styles.filterTextActive]}>
-            Pendientes
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.filterButton, filter === 'won' && styles.filterActive]}
-          onPress={() => setFilter('won')}
-        >
-          <Text style={[styles.filterText, filter === 'won' && styles.filterTextActive]}>
-            Ganadas
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.filterButton, filter === 'lost' && styles.filterActive]}
-          onPress={() => setFilter('lost')}
-        >
-          <Text style={[styles.filterText, filter === 'lost' && styles.filterTextActive]}>
-            Perdidas
-          </Text>
-        </TouchableOpacity>
-      </View>
+        {/* Filtros */}
+        <View style={styles.filterContainer}>
+          <TouchableOpacity
+            style={[styles.filterButton, filter === 'all' && styles.filterActive]}
+            onPress={() => setFilter('all')}
+          >
+            <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>
+              Todas
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.filterButton, filter === 'pending' && styles.filterActive]}
+            onPress={() => setFilter('pending')}
+          >
+            <Text style={[styles.filterText, filter === 'pending' && styles.filterTextActive]}>
+              Pendientes
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.filterButton, filter === 'won' && styles.filterActive]}
+            onPress={() => setFilter('won')}
+          >
+            <Text style={[styles.filterText, filter === 'won' && styles.filterTextActive]}>
+              Ganadas
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.filterButton, filter === 'lost' && styles.filterActive]}
+            onPress={() => setFilter('lost')}
+          >
+            <Text style={[styles.filterText, filter === 'lost' && styles.filterTextActive]}>
+              Perdidas
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Lista de historial */}
-      <FlatList
-        data={getFilteredHistory()}
-        keyExtractor={(item) => item.id}
-        renderItem={renderHistoryItem}
-        contentContainerStyle={styles.listContainer}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={fetchHistory}
-            tintColor="#fff"
-          />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="document-text-outline" size={60} color="#666" />
-            <Text style={styles.emptyText}>No hay historial disponible</Text>
-          </View>
-        }
-      />
-    </View>
+        {/* Lista de historial */}
+        <FlatList
+          data={getFilteredHistory()}
+          keyExtractor={(item) => item.id}
+          renderItem={renderHistoryItem}
+          contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={fetchHistory}
+              tintColor="#fff"
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="document-text-outline" size={60} color="#666" />
+              <Text style={styles.emptyText}>No hay historial disponible</Text>
+            </View>
+          }
+        />
+      </View>
+    </Modal>
   );
 }
 
@@ -286,6 +303,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 50,
+    backgroundColor: '#0a0a0a',
+  },
+  closeButton: {
+    padding: 5,
   },
   statsContainer: {
     padding: 20,
@@ -295,7 +323,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 20,
   },
   statsGrid: {
     flexDirection: 'row',
